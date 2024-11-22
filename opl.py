@@ -11,9 +11,9 @@ import random
 # insert your Telegram bot token here
 bot = telebot.TeleBot('7783857015:AAGgVzLYgIGQGao_40RBmxuP5eUHsySLirg')
 
-# Admin user IDs
-admin_ids = "6077036964"
-owner_id = ["6077036964"]
+# Owner and admin user IDs
+admin_ids = ["6077036964"]
+owner_id = "6077036964"
 # File to store allowed user IDs
 USER_FILE = "users.txt"
 
@@ -200,7 +200,7 @@ def send_welcome(message):
 @bot.message_handler(commands=['addadmin'])
 def add_admin(message):
     user_id = str(message.chat.id)
-     if user_id in admin_ids or user_id == owner_id:
+     if user_id == owner_id:
         command = message.text.split()
         if len(command) == 3:
             admin_to_add = command[1]
