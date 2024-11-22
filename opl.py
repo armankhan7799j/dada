@@ -200,7 +200,7 @@ def send_welcome(message):
 @bot.message_handler(commands=['addadmin'])
 def add_admin(message):
     user_id = str(message.chat.id)
-     if user_id == owner_id:
+    if user_id == owner_id:
         command = message.text.split()
         if len(command) == 3:
             admin_to_add = command[1]
