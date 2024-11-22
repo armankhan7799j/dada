@@ -200,7 +200,7 @@ def send_welcome(message):
 @bot.message_handler(commands=['addadmin'])
 def add_admin(message):
     user_id = str(message.chat.id)
-    if user_id == owner_id:
+     if user_id in admin_ids or user_id == owner_id:
         command = message.text.split()
         if len(command) == 3:
             admin_to_add = command[1]
@@ -296,7 +296,51 @@ def get_user_info(message):
     response = f"👤 Your Info:\n\n🆔 User ID: <code>{user_id}</code>\n📝 Username: {username}\n🔖 Role: {user_role}\n📅 Approval Expiry Date: {user_approval_expiry.get(user_id, 'Not Approved')}\n⏳ Remaining Approval Time: {remaining_time}"
     bot.reply_to(message, response, parse_mode="HTML")
 
+@bot.message_handler(commands=['approveuser'])
+def approve_user(message):
+    user_id = str(message.chat.id)
+    if user_id in admin_ids or user_id == owner_id:
+        command = message.text.split()
+        if len(command) == 3:
+            user_to_approve = command[1]
+            duration = command[2]
+            if duration not in key_prices:
+                response = "Invalid duration. Use 'day', 'week', or 'month'."
+                bot.send_message(message.chat.id, response)
+                return
 
+            expiration_date = datetime.datetime.now() + datetime.timedelta(days=1 if duration == "day" else 7 if duration == "week" else 30)
+            allowed_user_ids.append(user_to_approve)
+            with open(USER_FILE, "a") as file:
+                file.write(f"{user_to_approve} {expiration_date}\n")
+            
+            response = f"DEAR VIP USER ❤️\n\nYOUR APPROVE\nAR ID :--> {user_to_approve}\n\napproved for {duration}\n\nINJOY OUR BOT\n\nANY ENQUIRY ? CONTACT US. @MR_ARMAN_OWNER !\n\nTHANK YOU FOR BUYING OUR SERVICE 🐕‍🦺"
+        else:
+            response = "Usage: /approveuser <id> <duration>"
+    else:
+        response = "Only Admin or Owner Can Run This Command 😡."
+    bot.send_message(message.chat.id, response)
+
+@bot.message_handler(commands=['removeuser'])
+def remove_user(message):
+    user_id = str(message.chat.id)
+    if user_id in admin_ids or user_id == owner_id:
+        command = message.text.split()
+        if len(command) == 2:
+            user_to_remove = command[1]
+            if user_to_remove in allowed_user_ids:
+                allowed_user_ids.remove(user_to_remove)
+                with open(USER_FILE, "w") as file:
+                    for user in allowed_user_ids:
+                        file.write(f"{user}\n")
+                response = f"User {user_to_remove} removed successfully 👍."
+            else:
+                response = f"User {user_to_remove} not found in the list ❌."
+        else:
+            response = "Usage: /removeuser <id>"
+    else:
+        response = "Only Admin or Owner Can Run This Command 😡."
+    bot.send_message(message.chat.id, response)
 
 @bot.message_handler(commands=['remove'])
 def remove_user(message):
